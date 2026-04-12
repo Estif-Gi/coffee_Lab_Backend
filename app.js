@@ -20,7 +20,10 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors());
-app.use("/api/menu", menuRoutes);
+app.use("/", (req , res , next)=>{
+    res.json({message : "Welcome to Coffee Lab API"});})
+
+app.use("/api/menu", menuRoutes);   
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/promotions", promotionRoutes);
