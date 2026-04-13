@@ -1,277 +1,36 @@
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
+const successPage = require("./SuccessPage")
 
-const verifyEmail = async (req, res, next) => {
-    const { userId, token } = req.params;
-
-    const successPage = (email) => `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verified - Coffee Lab</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5ebe0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card {
-            background-color: #fff8f2;
-            border-radius: 16px;
-            padding: 48px 40px;
-            max-width: 460px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 8px 30px rgba(139, 90, 43, 0.12);
-            border-top: 5px solid #a0522d;
-        }
-
-        .icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            color: #6b3a2a;
-            font-size: 1.8rem;
-            margin-bottom: 12px;
-        }
-
-        p {
-            color: #8b6347;
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 8px;
-        }
-
-        .email {
-            display: inline-block;
-            background-color: #ede0d4;
-            color: #6b3a2a;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin: 12px 0 24px;
-            font-size: 0.95rem;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #a0522d;
-            color: #fff;
-            padding: 12px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-
-        .btn:hover { background-color: #7a3e20; }
-
-        .footer {
-            margin-top: 32px;
-            color: #b08870;
-            font-size: 0.82rem;
-        }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="icon">☕</div>
-        <h1>You're Verified!</h1>
-        <p>Your email address has been successfully verified.</p>
-        <span class="email">${email}</span>
-        <p>You can now log in and start exploring Coffee Lab.</p>
-        <br/>
-        <a href="${process.env.FRONTEND_URL || '#'}" class="btn">Go to Login</a>
-        <div class="footer">© ${new Date().getFullYear()} Coffee Lab. All rights reserved.</div>
-    </div>
-</body>
-</html>`;
-
-    const alreadyVerifiedPage = (email) => `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Already Verified - Coffee Lab</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5ebe0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card {
-            background-color: #fff8f2;
-            border-radius: 16px;
-            padding: 48px 40px;
-            max-width: 460px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 8px 30px rgba(139, 90, 43, 0.12);
-            border-top: 5px solid #c8956c;
-        }
-
-        .icon { font-size: 64px; margin-bottom: 20px; }
-
-        h1 { color: #6b3a2a; font-size: 1.8rem; margin-bottom: 12px; }
-
-        p { color: #8b6347; font-size: 1rem; line-height: 1.6; margin-bottom: 8px; }
-
-        .email {
-            display: inline-block;
-            background-color: #ede0d4;
-            color: #6b3a2a;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin: 12px 0 24px;
-            font-size: 0.95rem;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #a0522d;
-            color: #fff;
-            padding: 12px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .btn:hover { background-color: #7a3e20; }
-
-        .footer { margin-top: 32px; color: #b08870; font-size: 0.82rem; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="icon">✅</div>
-        <h1>Already Verified</h1>
-        <p>This account is already verified.</p>
-        <span class="email">${email}</span>
-        <p>You can go ahead and log in.</p>
-        <br/>
-        <a href="${process.env.FRONTEND_URL || '#'}" class="btn">Go to Login</a>
-        <div class="footer">© ${new Date().getFullYear()} Coffee Lab. All rights reserved.</div>
-    </div>
-</body>
-</html>`;
-
-    const errorPage = (message) => `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification Failed - Coffee Lab</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5ebe0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .card {
-            background-color: #fff8f2;
-            border-radius: 16px;
-            padding: 48px 40px;
-            max-width: 460px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 8px 30px rgba(139, 90, 43, 0.12);
-            border-top: 5px solid #c0392b;
-        }
-
-        .icon { font-size: 64px; margin-bottom: 20px; }
-
-        h1 { color: #6b3a2a; font-size: 1.8rem; margin-bottom: 12px; }
-
-        p { color: #8b6347; font-size: 1rem; line-height: 1.6; }
-
-        .error-msg {
-            background-color: #fdecea;
-            color: #c0392b;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin: 16px 0 24px;
-            font-size: 0.95rem;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #a0522d;
-            color: #fff;
-            padding: 12px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .btn:hover { background-color: #7a3e20; }
-
-        .footer { margin-top: 32px; color: #b08870; font-size: 0.82rem; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="icon">❌</div>
-        <h1>Verification Failed</h1>
-        <p>Something went wrong while verifying your email.</p>
-        <div class="error-msg">${message}</div>
-        <p>Please request a new verification link or contact support.</p>
-        <br/>
-        <a href="${process.env.FRONTEND_URL || '#'}" class="btn">Go to Home</a>
-        <div class="footer">© ${new Date().getFullYear()} Coffee Lab. All rights reserved.</div>
-    </div>
-</body>
-</html>`;
-
-    try {
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).send(errorPage('User not found.'));
-        }
-
-        if (user.isVerified) {
-            return res.status(200).send(alreadyVerifiedPage(user.email));
-        }
-
-        if (!user.verificationToken || user.verificationToken !== token || user.verificationTokenExpiry < Date.now()) {
-            return res.status(400).send(errorPage('Invalid or expired verification link.'));
-        }
-
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        user.verificationTokenExpiry = undefined;
-        await user.save();
-
-        res.status(200).send(successPage(user.email));
-
-    } catch (err) {
-        return res.status(500).send(errorPage('Something went wrong. Please try again later.'));
+const transporter = nodemailer.createTransport({
+    service: 'gmail',                    // Or use Brevo, SendGrid, Mailgun, etc.
+    auth: {
+        user: process.env.EMAIL_USER,    // e.g., yourgmail@gmail.com
+        pass: process.env.EMAIL_PASS     // App password (not normal password)
     }
+});
+
+const sendVerificationEmail = async (email, token, userId) => {
+    console.log('Preparing to send verification email to:', userId);
+    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const verificationLink = `${baseUrl}/api/users/verify-email/${userId}/${token}`;
+
+    const mailOptions = {
+        from: `"Coffee Lab" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Verify Your Email Address',
+        html: `
+            <h2>Welcome to Coffee Lab!</h2>
+            <p>Please click the link below to verify your email:</p>
+            <a href="${verificationLink}" style="padding:10px 20px; background:#4CAF50; color:white; text-decoration:none;">
+                Verify Email
+            </a>
+            <p>This link expires in 24 hours.</p>
+        `
+    };
+
+    await transporter.sendMail(mailOptions);
 };
+
+module.exports = { sendVerificationEmail };
