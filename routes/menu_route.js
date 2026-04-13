@@ -25,7 +25,6 @@ router.post('/',
         check('name').notEmpty().withMessage('Name is required'),
         check('description').notEmpty().withMessage('Description is required'),
         check('priceCents').notEmpty().withMessage('Price is required'),
-        check('imageUrl').isURL().withMessage('Image URL must be a valid URL'),
     ], CreateMenuItem);
 
 router.patch('/:id',
