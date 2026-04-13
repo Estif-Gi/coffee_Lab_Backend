@@ -68,13 +68,13 @@ const CreateMenuItem = async (req, res, next) => {
         console.error("Cloudinary upload error:", uploadError);
         return next(new HttpError('Failed to upload image to Cloudinary', 500));
     }
-    menuItem = new MenuItem({ category, name, description, priceCents, featured, imageUrl, available, sortOrder });
+    menuItem = new MenuItem({ category, name, description, priceCents, featured, imageUrl, publicId , available, sortOrder });
 
     try {
         await menuItem.save();
         res.status(201).json({ menuItem });
     } catch (err) {
-        return next(new HttpError('Creating menu item failed, please try again later.', 500));
+        return next(new HttpError('Creating menu item failed, please try again later.900', 500));
     }
 }
 
@@ -123,7 +123,6 @@ const UpdateMenuItem = async (req, res, next) => {
                 description: description || updatedMenuItem?.description,
                 priceCents: priceCents || updatedMenuItem?.priceCents,
                 imageUrl: updatedImageUrl || updatedMenuItem?.imageUrl,
-                publicId: updatedPublicId || updatedMenuItem?.publicId,
                 available: available || updatedMenuItem?.available,
                 sortOrder: sortOrder || updatedMenuItem?.sortOrder
             },

@@ -36,7 +36,7 @@ app.use(routerError);
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@coffeelab.ol249js.mongodb.net/`, {
 }).then(() => {
     console.log('************Connected to MongoDB*************');
-    app.listen(process.env.PORT || 3000, () => {
+    app.listen( 3000, () => {
         console.log(`Server is running on port http://localhost:${process.env.PORT || 3000}`);
     });
 }).catch((err) => {
