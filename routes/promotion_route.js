@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
+
+const {uploadToCloudinary} = require('../middleware/file_upload')
 const checkAuth = require('../middleware/check_auth');
 
 const {
@@ -17,7 +19,9 @@ router.get('/:id', GetPromotionById);
 
 router.use(checkAuth); // Apply authentication middleware to all routes below
 
-router.post('/',[
+router.post('/',
+    uploadToCloudinary.single("image"),
+    [
     check('title').notEmpty().withMessage('Title is required'),
     check('description').notEmpty().withMessage('Description is required'),
     check('discountType').notEmpty().withMessage('Discount type is required'),

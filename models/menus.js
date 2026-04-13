@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const menuSchema = new Schema({
     category:{
         type: String,
-        enum: ['Coffee', 'Cold Drinks', 'Pastries / Snacks'],
+        enum: ['Hot Drinks', 'Cold Drinks', 'Pastries / Snacks'],
         required: true
     },
     name: {

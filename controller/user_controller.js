@@ -104,6 +104,7 @@ const login = async (req, res, next) => {
     }
 
     res.status(200).json(new HttpSuccess('Logged in successfully', {
+        name: existingUser.name,
         userId: existingUser.id,
         email: existingUser.email,
         role: existingUser.role,

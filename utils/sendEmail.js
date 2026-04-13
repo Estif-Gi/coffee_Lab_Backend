@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-const successPage = require("./SuccessPage")
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',                    // Or use Brevo, SendGrid, Mailgun, etc.
