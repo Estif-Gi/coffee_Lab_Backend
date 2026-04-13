@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "base3kUrl",
-      "value": "http://localhost:3000"
+      "value": "https://localhost3000"
     },
     {
       "key": "authToken",

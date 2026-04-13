@@ -1,9 +1,4 @@
-
-
-const verifyEmail = async (req, res, next) => {
-    const { userId, token } = req.params;
-
-    const successPage = (email) => `
+export const successPage = (email) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,7 +92,7 @@ const verifyEmail = async (req, res, next) => {
 </body>
 </html>`;
 
-    const alreadyVerifiedPage = (email) => `
+export const alreadyVerifiedPage = (email) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,7 +169,7 @@ const verifyEmail = async (req, res, next) => {
 </body>
 </html>`;
 
-    const errorPage = (message) => `
+export const errorPage = (message) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -201,77 +196,4 @@ const verifyEmail = async (req, res, next) => {
             width: 90%;
             text-align: center;
             box-shadow: 0 8px 30px rgba(139, 90, 43, 0.12);
-            border-top: 5px solid #c0392b;
-        }
-
-        .icon { font-size: 64px; margin-bottom: 20px; }
-
-        h1 { color: #6b3a2a; font-size: 1.8rem; margin-bottom: 12px; }
-
-        p { color: #8b6347; font-size: 1rem; line-height: 1.6; }
-
-        .error-msg {
-            background-color: #fdecea;
-            color: #c0392b;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin: 16px 0 24px;
-            font-size: 0.95rem;
-        }
-
-        .btn {
-            display: inline-block;
-            background-color: #a0522d;
-            color: #fff;
-            padding: 12px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .btn:hover { background-color: #7a3e20; }
-
-        .footer { margin-top: 32px; color: #b08870; font-size: 0.82rem; }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="icon">❌</div>
-        <h1>Verification Failed</h1>
-        <p>Something went wrong while verifying your email.</p>
-        <div class="error-msg">${message}</div>
-        <p>Please request a new verification link or contact support.</p>
-        <br/>
-        <a href="${process.env.FRONTEND_URL || '#'}" class="btn">Go to Home</a>
-        <div class="footer">© ${new Date().getFullYear()} Coffee Lab. All rights reserved.</div>
-    </div>
-</body>
-</html>`;
-
-    try {
-        const user = await User.findById(userId);
-
-        if (!user) {
-            return res.status(404).send(errorPage('User not found.'));
-        }
-
-        if (user.isVerified) {
-            return res.status(200).send(alreadyVerifiedPage(user.email));
-        }
-
-        if (!user.verificationToken || user.verificationToken !== token || user.verificationTokenExpiry < Date.now()) {
-            return res.status(400).send(errorPage('Invalid or expired verification link.'));
-        }
-
-        user.isVerified = true;
-        user.verificationToken = undefined;
-        user.verificationTokenExpiry = undefined;
-        await user.save();
-
-        res.status(200).send(successPage(user.email));
-
-    } catch (err) {
-        return res.status(500).send(errorPage('Something went wrong. Please try again later.'));
-    }
-};
+            border-top: 5px solid #c0392b;`
